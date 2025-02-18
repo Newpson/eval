@@ -1,18 +1,17 @@
 #include "evaluable.h"
 
-Evaluable::Evaluable(
-    const Type type, const Priority priority):
+Evaluable::Evaluable(const Type type, const int priority):
     type(type), priority(priority)
 {}
 
-double Evaluable::pull(std::stack<double> &args)
+double Evaluable::pull_arg(arg_stack_t &args) const
 {
     double value = args.top();
     args.pop();
     return value;
 }
 
-bool Evaluable::operator==(const Evaluable &evaluable)
+double Evaluable::eval(arg_stack_t &args, eval_stack_t &evals) const
 {
-    return this == &evaluable;
+    return 0.0;
 }

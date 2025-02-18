@@ -1,22 +1,19 @@
 #pragma once
 
 #include <cmath>
-#include <stack>
+#include <memory>
 #include <string>
 #include <unordered_map>
+
 #include "evaluable.h"
 
 class Evaluator
 {
 public:
+    using library_t = std::unordered_map<std::string, std::shared_ptr<Evaluable>>;
+    static const library_t default_library;
+
     Evaluator() = default;
 
-    double eval(const std::string &expression);
-    void add_evaluable(const std::string &name, const Evaluable *evaluable);
-    void set_library(std::unordered_map<std::string, Evaluable *> &library);
-
-private:
-    std::unordered_map<const std::string, const Evaluable *> library;
-    std::stack<double> arguments;
-    std::stack<Evaluable> evaluables;
+    double eval(const std::string &expression, const library_t &library = default_library);
 };

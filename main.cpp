@@ -1,23 +1,14 @@
-// #include "evaluator.h"
 #include <iostream>
+#include <string>
 
-float a()
-{
-    return 1.0;
-}
-
-float b()
-{
-    return 2.0;
-}
+#include "evaluator.h"
 
 int main()
 {
-    std::string equation("sin(x - sin(2 * pow(1 + 3 + 4.88 / 45 - 9, 0.33 - x)) + sin(1 + 3.1415 / x)");
+    std::string expression("1.0 - sin(2^(sin(4)))");
+    Evaluator evaluator;
+    double value = evaluator.eval(expression);
+    std::cout << value << std::endl;
 
-    // Evaluator evaluator;
-    // double value = evaluator.eval(equation);
-
-    // std::cout << value << std::endl;
     return 0;
 }
