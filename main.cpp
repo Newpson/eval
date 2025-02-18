@@ -1,8 +1,10 @@
 #include <iostream>
 #include <string>
+#include <memory>
 
 #include <cmath>
-
+#include "evaluable.h"
+#include "variable.h"
 #include "evaluator.h"
 
 class func_sin: public Evaluable
@@ -17,18 +19,20 @@ public:
 
 int main()
 {
-
-    std::string expression("1.0 - sin(2^(sin(4)))");
     Evaluator::library_t extension = {
-        {"sin", std::shared_ptr<Evaluable>(new func_sin())}
+        {"sin", std::shared_ptr<Evaluable>(new func_sin())},
+        {"x", std::shared_ptr<Variable>(new Variable())},
     };
     // FIXME extreme bullshit (std::unordered map can't merge with const (WTF?) so we create a copy)
     // extension.merge(Evaluator::default_library);
     Evaluator::library_t library(Evaluator::default_library);
-
     library.merge(extension);
-    double value = Evaluator::eval(expression, library);
-    std::cout << value << std::endl;
+
+    std::string expression("1.0 - sin(x)");
+    std::cout << "x = 0.0: " << Evaluator::eval(expression, library) << std::endl;
+    // FIXME [should i really fix this?] (simplify variable modification)
+    dynamic_cast<Variable &>(*library["x"]).value = 1.0;
+    std::cout << "x = 1.0: " << Evaluator::eval(expression, library) << std::endl;
 
     return 0;
 }

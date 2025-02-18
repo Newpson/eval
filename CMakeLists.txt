@@ -11,7 +11,8 @@ target_sources(app
     main.cpp)
 target_link_libraries(app
     PUBLIC
-    evaluator)
+    evaluator
+    variable)
 
 add_library(evaluator STATIC)
 target_sources(evaluator
@@ -22,6 +23,16 @@ target_sources(evaluator
 target_link_libraries(evaluator
     PRIVATE
     tokens
+    evaluable)
+
+add_library(variable STATIC)
+target_sources(variable
+    PRIVATE
+    variable.cpp
+    PUBLIC
+    variable.h)
+target_link_libraries(variable
+    PRIVATE
     evaluable)
 
 add_library(evaluable STATIC)
@@ -37,3 +48,5 @@ target_sources(tokens
     tokens.cpp
     PUBLIC
     tokens.h)
+
+
