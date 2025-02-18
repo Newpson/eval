@@ -83,5 +83,4 @@ const Evaluator::library_t Evaluator::default_library = {
     {"*", std::shared_ptr<Evaluable>(new op_asterisk())},
     {"/", std::shared_ptr<Evaluable>(new op_slash())},
     {"^", std::shared_ptr<Evaluable>(new op_caret())},
-    {"sin", std::shared_ptr<Evaluable>(new func_sin())},
 };
