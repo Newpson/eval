@@ -18,8 +18,9 @@ std::vector<std::string_view> tokenize(
         const std::string &delimiters)
 {
     std::vector<std::string_view> tokens;
-    std::string::const_iterator token_begin = string.begin();
-    for (auto string_iter = string.begin(); string_iter != string.end(); ++string_iter) {
+    auto token_begin = string.begin();
+
+    for (auto string_iter = token_begin; string_iter != string.end(); ++string_iter) {
         if (is_delimiter(*string_iter, delimiters)) {
             std::string::const_iterator token_end = string_iter;
             if (token_end - token_begin > 0)
@@ -28,5 +29,7 @@ std::vector<std::string_view> tokenize(
             token_begin = token_end + 1;
         }
     }
+    if (string.end() - token_begin > 0)
+        tokens.push_back(std::string_view(token_begin.base(), string.end().base()));
     return tokens;
 }
