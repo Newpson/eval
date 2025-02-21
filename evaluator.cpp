@@ -9,26 +9,32 @@
 #include "evaluator-default_library.h"
 #include "tokens.h"
 
+#include <cassert>
+
+bool Evaluator::iscallable(const Evaluable::Type type)
+{
+    return (type == Evaluable::Type::OPERATOR || type == Evaluable::Type::FUNCTION);
+}
+
 double Evaluator::eval(const std::string &expression, const library_t &library)
 {
     std::string packed(expression);
     std::erase_if(packed, [](unsigned char x) { return std::isspace(x); });
-    packed.insert(packed.begin(), '(');
-    packed += ')';
 
     // FIXME extreme bullshit (hardcoded delimiters)
+    // [generate delimiters from OPERATOR | PARENTHESIS_* | COMMA]
+    // [maybe combine OPERATOR and FUNCTION into single type]
     const auto tokens = tokenize(packed, "+-*/(),^");
+
     Evaluable::arg_stack_t args;
     Evaluable::eval_stack_t evals;
 
     for (const std::string_view &token: tokens)
     {
-        // FIXME extreme bullshit (create string from string_view to match unordered_map.push call)
+        // FIXME extreme bullshit (create string from string_view to match unordered_map api)
         std::string token_str(token);
         if (std::isdigit(token_str[0]))
-        {
             args.push(std::stod(token_str));
-        }
         else if (library.contains(token_str))
         {
             auto current = library.at(token_str);
@@ -38,22 +44,23 @@ double Evaluator::eval(const std::string &expression, const library_t &library)
                 args.push(current->eval(args, evals));
                 break;
             case Evaluable::Type::FUNCTION:
-                evals.push(current);
-                break;
+                [[ fallthrough ]];
             case Evaluable::Type::OPERATOR:
             {
                 auto top = evals.empty() ? nullptr : evals.top();
-                if (top != nullptr && top->type == Evaluable::Type::OPERATOR && top->priority >= current->priority)
+                while (top != nullptr && iscallable(top->type) && top->priority >= current->priority)
                 {
                     args.push(top->eval(args, evals));
                     evals.pop(); // pop just evaluated operator
+                    top = evals.empty() ? nullptr : evals.top();
                 }
                 evals.push(current);
                 break;
             }
             case Evaluable::Type::PARENTHESIS_LEFT:
-            case Evaluable::Type::COMMA:
                 evals.push(current);
+                [[ fallthrough ]];
+            case Evaluable::Type::COMMA:
                 break;
             case Evaluable::Type::PARENTHESIS_RIGHT:
                 current->eval(args, evals);
@@ -71,6 +78,12 @@ double Evaluator::eval(const std::string &expression, const library_t &library)
         }
     }
 
+    while (!evals.empty()) {
+        args.push(evals.top()->eval(args, evals));
+        evals.pop();
+    }
+
+    assert(args.size() != 0);
     return args.top();
 }
 

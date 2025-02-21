@@ -4,6 +4,14 @@
 
 #include "evaluable.h"
 
+/* priority (descending):
+   ( ) ,
+   func
+   ^
+   * /
+   + -
+*/
+
 class parenthesis_left: public Evaluable
 {
 public:
@@ -17,22 +25,12 @@ public:
 
     virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
     {
-        std::shared_ptr<const Evaluable> current = evals.top();
-        for (; current->type != Type::PARENTHESIS_LEFT; current = evals.top())
-        {
-            double value = evals.top()->eval(args, evals);
-            if (current->type == Type::OPERATOR)
-                args.push(value);
-            evals.pop(); // pop just evaluated operator
+        while (!evals.empty() && evals.top()->type != Type::PARENTHESIS_LEFT) {
+            args.push(evals.top()->eval(args, evals));
+            evals.pop();
         }
-        evals.pop(); // pop "("
-        if (!evals.empty()) {
-            current = evals.top();
-            if (current->type == Type::FUNCTION) {
-                args.push(current->eval(args, evals));
-                evals.pop(); // pop just evaluated function
-            }
-        }
+        if (!evals.empty())
+            evals.pop(); // pop "("
         return 0.0;
     }
 };
@@ -46,7 +44,7 @@ public:
 class op_plus: public Evaluable
 {
 public:
-    op_plus(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 3) {}
+    op_plus(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 4) {}
     virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
     {
         return pull_arg(args) + pull_arg(args);
@@ -56,7 +54,7 @@ public:
 class op_minus: public Evaluable
 {
 public:
-    op_minus(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 3) {}
+    op_minus(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 4) {}
     virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
     {
         double right = pull_arg(args);
@@ -68,7 +66,7 @@ public:
 class op_asterisk: public Evaluable
 {
 public:
-    op_asterisk(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 2) {}
+    op_asterisk(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 3) {}
     virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
     {
         return pull_arg(args) * pull_arg(args);
@@ -78,7 +76,7 @@ public:
 class op_slash: public Evaluable
 {
 public:
-    op_slash(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 2) {}
+    op_slash(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 3) {}
     virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
     {
         double right = pull_arg(args);
@@ -90,7 +88,7 @@ public:
 class op_caret: public Evaluable
 {
 public:
-    op_caret(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 1) {}
+    op_caret(): Evaluable(Type::OPERATOR, PRIORITY_MAX - 2) {}
     virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
     {
         double exponent = pull_arg(args);

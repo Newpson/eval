@@ -10,7 +10,7 @@
 class func_sin: public Evaluable
 {
 public:
-    func_sin(): Evaluable(Type::FUNCTION, PRIORITY_MAX - 1) {}
+    func_sin(): Evaluable(Type::FUNCTION, PRIORITY_MAX-1) {}
     virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
     {
         return std::sin(pull_arg(args));
@@ -28,11 +28,7 @@ int main()
     Evaluator::library_t library(Evaluator::default_library);
     library.merge(extension);
 
-    std::string expression("1.0 - sin(x)");
-    std::cout << "x = 0.0: " << Evaluator::eval(expression, library) << std::endl;
-    // FIXME [should i really fix this?] (simplify variable modification)
-    dynamic_cast<Variable &>(*library["x"]).value = 1.0;
-    std::cout << "x = 1.0: " << Evaluator::eval(expression, library) << std::endl;
-
+    std::string expression("2*2 - sin(2*2)^2 + 1");
+    std::cout << "Value: " << Evaluator::eval(expression, library) << std::endl;
     return 0;
 }

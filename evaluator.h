@@ -13,4 +13,6 @@ public:
     static const library_t default_library;
 
     static double eval(const std::string &expression, const library_t &library = default_library);
+protected:
+    static bool iscallable(const Evaluable::Type type);
 };
