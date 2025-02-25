@@ -19,14 +19,11 @@ public:
 
 int main()
 {
-    Evaluator::library_t extension = {
+    Evaluator::library_t library = {
         {"sin", std::shared_ptr<Evaluable>(new func_sin())},
         {"x", std::shared_ptr<Variable>(new Variable())},
     };
-    // FIXME extreme bullshit (std::unordered map can't merge with const (WTF?) so we create a copy)
-    // extension.merge(Evaluator::default_library);
-    Evaluator::library_t library(Evaluator::default_library);
-    library.merge(extension);
+    library.insert(Evaluator::default_library.begin(), Evaluator::default_library.end());
 
     std::string expression("2*2 - sin(2*2)^2 + 1");
     std::cout << "Value: " << Evaluator::eval(expression, library) << std::endl;
