@@ -19,13 +19,17 @@ public:
 
 int main()
 {
+    std::shared_ptr<Variable> x(new Variable());
     Evaluator::library_t library = {
         {"sin", std::shared_ptr<Evaluable>(new func_sin())},
-        {"x", std::shared_ptr<Variable>(new Variable())},
+        {"x", x},
     };
     library.insert(Evaluator::default_library.begin(), Evaluator::default_library.end());
 
-    std::string expression("2*2 - sin(2*2)^2 + 1");
-    std::cout << "Value: " << Evaluator::eval(expression, library) << std::endl;
+    x->value = 3.1415;
+    std::cout << Evaluator::eval("sin(x)", library) << std::endl;
+    x->value = 4.14;
+    std::cout << Evaluator::eval("sin(x)", library) << std::endl;
+
     return 0;
 }
