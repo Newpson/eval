@@ -3,6 +3,7 @@
 #include <cctype>
 #include <string>
 #include <vector>
+#include <charconv>
 
 #include "evaluator.h"
 #include "evaluable.h"
@@ -14,6 +15,31 @@
 bool Evaluator::iscallable(const Evaluable::Type type)
 {
     return (type == Evaluable::Type::OPERATOR || type == Evaluable::Type::FUNCTION);
+}
+
+bool Evaluator::Comparator::operator()(const std::string &str, const std::string_view strview) const
+{
+    return str == strview;
+}
+
+bool Evaluator::Comparator::operator()(const std::string_view strview, const std::string &str) const
+{
+    return strview == str;
+}
+
+bool Evaluator::Comparator::operator()(const std::string &a, const std::string &b) const
+{
+    return a == b;
+}
+
+std::size_t Evaluator::Hasher::operator()(const std::string &str) const
+{
+    return std::hash<std::string>{}(str);
+}
+
+std::size_t Evaluator::Hasher::operator()(const std::string_view strview) const
+{
+    return std::hash<std::string_view>{}(strview);
 }
 
 double Evaluator::eval(const std::string &expression, const library_t &library)
@@ -31,13 +57,16 @@ double Evaluator::eval(const std::string &expression, const library_t &library)
 
     for (const std::string_view &token: tokens)
     {
-        // FIXME extreme bullshit (create string from string_view to match unordered_map api)
-        std::string token_str(token);
-        if (std::isdigit(token_str[0]))
-            args.push(std::stod(token_str));
-        else if (library.contains(token_str))
+        if (std::isdigit(token[0])) {
+            double value;
+            std::from_chars(token.begin(), token.end(), value);
+            // TODO check std::from_chars_result
+            args.push(value);
+        }
+        else if (library.contains(token))
         {
-            auto current = library.at(token_str);
+            // TODO check if found (merge with whole `else if` branch)
+            auto current = library.find(token)->second;
             switch (current->type)
             {
             case Evaluable::Type::VARIABLE:
