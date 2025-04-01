@@ -1,27 +1,14 @@
 #include <iostream>
-#include <string>
 #include <memory>
+#include <string>
 
-#include <cmath>
-#include "evaluable.h"
-#include "variable.h"
 #include "evaluator.h"
-
-class func_sin: public Evaluable
-{
-public:
-    func_sin(): Evaluable(Type::FUNCTION, PRIORITY_MAX-1) {}
-    virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
-    {
-        return std::sin(pull_arg(args));
-    }
-};
+#include "variable.h"
 
 int main()
 {
     std::shared_ptr<Variable> x(new Variable());
     Evaluator::library_t library = {
-        {"sin", std::shared_ptr<Evaluable>(new func_sin())},
         {"x", x},
     };
     library.insert(Evaluator::default_library.begin(), Evaluator::default_library.end());

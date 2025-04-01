@@ -96,3 +96,57 @@ public:
         return std::pow(base, exponent);
     }
 };
+
+//
+// Mathematical functions
+//
+
+class func_exp: public Evaluable
+{
+public:
+    func_exp(): Evaluable(Type::FUNCTION, PRIORITY_MAX - 1) {}
+    virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
+    {
+        return std::exp(pull_arg(args));
+    }
+};
+
+class func_sin: public Evaluable
+{
+public:
+    func_sin(): Evaluable(Type::FUNCTION, PRIORITY_MAX - 1) {}
+    virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
+    {
+        return std::sin(pull_arg(args));
+    }
+};
+
+class func_cos: public Evaluable
+{
+public:
+    func_cos(): Evaluable(Type::FUNCTION, PRIORITY_MAX - 1) {}
+    virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
+    {
+        return std::cos(pull_arg(args));
+    }
+};
+
+class func_tan: public Evaluable
+{
+public:
+    func_tan(): Evaluable(Type::FUNCTION, PRIORITY_MAX - 1) {}
+    virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
+    {
+        return std::tan(pull_arg(args));
+    }
+};
+
+class func_log: public Evaluable
+{
+public:
+    func_log(): Evaluable(Type::FUNCTION, PRIORITY_MAX - 1) {}
+    virtual double eval(arg_stack_t &args, eval_stack_t &evals) const override
+    {
+        return std::log(pull_arg(args));
+    }
+};
